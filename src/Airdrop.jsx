@@ -1,15 +1,39 @@
+import { useEffect, useState } from "react"; // Import useState to manage balance
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import SolIcon from "./assets/sol-icon.png";
 
 export function Airdrop({ children }) {
   const wallet = useWallet();
   const { connection } = useConnection();
+  const [userBalance, setUserBalance] = useState(0); // State to manage user balance
+
+  // Function to fetch and set user balance
+  const fetchUserBalance = async () => {
+    if (wallet.publicKey) {
+      const balance = await connection.getBalance(wallet.publicKey);
+      setUserBalance(balance / LAMPORTS_PER_SOL); // Update balance state
+      console.log(balance);
+    }
+  };
+
+  // useEffect to fetch user balance on component mount and wallet change
+  useEffect(() => {
+    fetchUserBalance();
+  }, [wallet.publicKey, connection]);
 
   async function ClickHandler() {
     const amount = document.getElementById("publickey").value;
-    connection.requestAirdrop(wallet.publicKey, amount * 1000000000);
-    const sendAmount = amount * 1000000000 / 1000000000;
-    alert(`Airdrop Send to ${wallet.publicKey.toString()} of ${sendAmount} Sol`);
+    const airdropAmount = amount * LAMPORTS_PER_SOL; // Calculate amount in lamports
+    await connection.requestAirdrop(wallet.publicKey, airdropAmount); // Request airdrop
+    const sendAmount = amount; // Amount in SOL
+    console.log(wallet.publicKey.toString());
+
+    alert(
+      `Airdrop sent to ${wallet.publicKey.toString()} of ${sendAmount} SOL`
+    );
+
+    fetchUserBalance(); // Refresh balance after airdrop
   }
 
   return (
@@ -35,6 +59,13 @@ export function Airdrop({ children }) {
             >
               Request Airdrop
             </button>
+
+            <div className="flex">
+              <p className="font-bold mt-4 ml-10">Account Balance:</p>
+              <div className="mt-4 ml-2 font-bold" id="userbal">
+                {userBalance.toFixed(2)} SOL {/* Display user balance */}
+              </div>
+            </div>
           </div>
           <div className="flex justify-between p-4">{children}</div>
         </div>
