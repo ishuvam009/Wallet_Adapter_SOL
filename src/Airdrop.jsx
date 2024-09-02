@@ -1,6 +1,17 @@
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import SolIcon from "./assets/sol-icon.png";
 
 export function Airdrop({ children }) {
+  const wallet = useWallet();
+  const { connection } = useConnection();
+
+  async function ClickHandler() {
+    const amount = document.getElementById("publickey").value;
+    connection.requestAirdrop(wallet.publicKey, amount * 1000000000);
+    const sendAmount = amount * 1000000000 / 1000000000;
+    alert(`Airdrop Send to ${wallet.publicKey.toString()} of ${sendAmount} Sol`);
+  }
+
   return (
     <>
       <div className="flex justify-center pt-16">
@@ -14,10 +25,14 @@ export function Airdrop({ children }) {
           <div className="p-4">
             <input
               type="text"
+              id="publickey"
               placeholder="Enter Amount"
               className="p-2 mx-10"
             />
-            <button className="rounded-lg bg-blue-400 p-2">
+            <button
+              onClick={ClickHandler}
+              className="rounded-lg bg-blue-400 p-2"
+            >
               Request Airdrop
             </button>
           </div>

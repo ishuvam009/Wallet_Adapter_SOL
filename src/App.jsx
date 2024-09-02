@@ -20,8 +20,15 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import "./App.css";
 
 function App() {
+  // const rpcApi = process.env.VITE_RPCDEVNRTAPI;
+  // console.log(rpcApi)
+
   return (
-    <ConnectionProvider endpoint={"https://api.devnet.solana.com"}>
+    <ConnectionProvider
+      endpoint={
+        "https://solana-devnet.g.a"
+      }
+    >
       <WalletProvider wallets={[]} autoConnect>
         <WalletModalProvider>
           <Airdrop>
